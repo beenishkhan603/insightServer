@@ -12,7 +12,7 @@ const createUser = async (req, res) => {
 		console.log('req.body is', req.body);
 
 		// Check if required fields are provided
-		const requiredFields = ['email', 'firstname', 'lastname', 'password'];
+		const requiredFields = ['email', 'firstName', 'lastName', 'password'];
 		const missingFields = requiredFields.filter((field) => !req.body[field]);
 
 		if (missingFields.length > 0) {
@@ -55,8 +55,8 @@ const createUser = async (req, res) => {
 			let newUser;
 			newUser = await new userModel({
 				email: email,
-				firstname: req.body.firstname,
-				lastname: req.body.lastname,
+				firstname: req.body.firstName,
+				lastname: req.body.lastName,
 				password: encryptedPassword,
 			}).save();
 
