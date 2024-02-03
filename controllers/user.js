@@ -1,11 +1,7 @@
 var userModel = require('../model/user');
 const bcrypt = require('bcrypt');
-var ObjectId = require('mongodb').ObjectID;
 const saltRounds = 10;
 var jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-// const { sendEmail } = require('../helpers/sendEmail');
-// const { sendMessage } = require('../helpers/sendMessage');
 
 const createUser = async (req, res) => {
 	try {
@@ -134,7 +130,7 @@ const login = async (req, res) => {
 			});
 		}
 	} catch (err) {
-		console.log('err.isJoi: ', err);
+		console.log('err: ', err);
 		return res.status(500).json({
 			success: false,
 			message: 'Internal Server Error',

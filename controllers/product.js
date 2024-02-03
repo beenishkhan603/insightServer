@@ -3,8 +3,63 @@ const Product = require('../model/product');
 // Function to create a new product
 const createProduct = async (req, res) => {
 	try {
-		const productData = req.body;
+		console.log(req.body);
+		// Validate required fields
+		const requiredFields = [
+			'name',
+			'description',
+			'category',
+			'price',
+			'manufacturer',
+			'stockQuantity',
+		];
+		const missingFields = requiredFields.filter((field) => !req.body[field]);
+
+		if (missingFields.length > 0) {
+			return res.status(400).json({
+				success: false,
+				message: `Fields ${missingFields.join(', ')} are required.`,
+			});
+		}
+
+		// Validate data types
+		const {
+			name,
+			description,
+			image,
+			category,
+			price,
+			manufacturer,
+			stockQuantity,
+		} = req.body;
+
+		if (
+			typeof name !== 'string' ||
+			typeof description !== 'string' ||
+			typeof image !== 'string' ||
+			typeof category !== 'string' ||
+			typeof price !== 'number' ||
+			typeof manufacturer !== 'string' ||
+			typeof stockQuantity !== 'number'
+		) {
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid data types. Check the format of the provided data.',
+			});
+		}
+
+		const productData = {
+			name: name,
+			description: description,
+			image: req.file.filename,
+			category: category,
+			price: price,
+			manufacturer: manufacturer,
+			stockQuantity: stockQuantity,
+		};
+
 		const newProduct = await Product.create(productData);
+
 		res.status(201).json({
 			success: true,
 			message: 'Product created successfully',
