@@ -22,17 +22,21 @@ const createProduct = async (req, res) => {
 			});
 		}
 
-		// Validate data types
-		const {
-			name,
-			description,
-			image,
-			category,
-			price,
-			manufacturer,
-			stockQuantity,
-		} = req.body;
-
+		const { name, description, category, price, manufacturer, stockQuantity } =
+			req.body;
+		if (
+			typeof name !== 'string' ||
+			typeof description !== 'string' ||
+			typeof category !== 'string' ||
+			typeof price !== 'number' ||
+			typeof manufacturer !== 'string' ||
+			typeof stockQuantity !== 'number'
+		) {
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid data types. Check the format of the provided data.',
+			});
+		}
 		const productData = {
 			name: name,
 			description: description,
@@ -90,22 +94,40 @@ const fetchProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
 	try {
 		const productId = req.params.id;
+		const image = req?.file;
 		const { name, description, category, price, manufacturer, stockQuantity } =
 			req.body;
+		if (
+			typeof name !== 'string' ||
+			typeof description !== 'string' ||
+			typeof category !== 'string' ||
+			typeof price !== 'number' ||
+			typeof manufacturer !== 'string' ||
+			typeof stockQuantity !== 'number'
+		) {
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid data types. Check the format of the provided data.',
+			});
+		}
+
 		const updatedData = {
 			name,
 			description,
 			category,
-			price,
+			price: price,
 			manufacturer,
-			stockQuantity,
+			stockQuantity: stockQuantity,
 		};
-		console.log('updated', updatedData);
+		// Check if a new image is provided
+		if (image) {
+			updatedData.image = image;
+		}
 		const updatedProduct = await Product.findByIdAndUpdate(
 			productId,
-			updatedData
+			updatedData,
+			{ new: true }
 		);
-		console.log('updatsadasded', updatedProduct);
 		if (!updatedProduct) {
 			return res
 				.status(404)
