@@ -24,17 +24,14 @@ const createProduct = async (req, res) => {
 
 		const { name, description, category, price, manufacturer, stockQuantity } =
 			req.body;
-		if (
-			typeof name !== 'string' ||
-			typeof description !== 'string' ||
-			typeof category !== 'string' ||
-			typeof price !== 'number' ||
-			typeof manufacturer !== 'string' ||
-			typeof stockQuantity !== 'number'
-		) {
+		const parsedStockQuantity = parseInt(stockQuantity);
+		const parsedPrice = parseInt(price);
+
+		// Validate that stockQuantity and price are valid numbers
+		if (isNaN(parsedStockQuantity) || isNaN(parsedPrice)) {
 			return res.status(400).json({
 				success: false,
-				message: 'Invalid data types. Check the format of the provided data.',
+				message: 'Invalid stock quantity or price. They must be numbers.',
 			});
 		}
 		const productData = {
@@ -42,9 +39,9 @@ const createProduct = async (req, res) => {
 			description: description,
 			image: req.file.filename,
 			category: category,
-			price: price,
+			price: parsedPrice,
 			manufacturer: manufacturer,
-			stockQuantity: stockQuantity,
+			stockQuantity: parsedStockQuantity,
 		};
 
 		const newProduct = await Product.create(productData);
@@ -97,17 +94,14 @@ const updateProduct = async (req, res) => {
 		const image = req?.file;
 		const { name, description, category, price, manufacturer, stockQuantity } =
 			req.body;
-		if (
-			typeof name !== 'string' ||
-			typeof description !== 'string' ||
-			typeof category !== 'string' ||
-			typeof price !== 'number' ||
-			typeof manufacturer !== 'string' ||
-			typeof stockQuantity !== 'number'
-		) {
+		const parsedStockQuantity = parseInt(stockQuantity);
+		const parsedPrice = parseInt(price);
+
+		// Validate that stockQuantity and price are valid numbers
+		if (isNaN(parsedStockQuantity) || isNaN(parsedPrice)) {
 			return res.status(400).json({
 				success: false,
-				message: 'Invalid data types. Check the format of the provided data.',
+				message: 'Invalid stock quantity or price. They must be numbers.',
 			});
 		}
 
@@ -115,13 +109,13 @@ const updateProduct = async (req, res) => {
 			name,
 			description,
 			category,
-			price: price,
+			price: parsedStockQuantity,
 			manufacturer,
-			stockQuantity: stockQuantity,
+			stockQuantity: parsedPrice,
 		};
 		// Check if a new image is provided
 		if (image) {
-			updatedData.image = image;
+			updatedData.image = image.filename;
 		}
 		const updatedProduct = await Product.findByIdAndUpdate(
 			productId,
