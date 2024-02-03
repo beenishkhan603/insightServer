@@ -2,14 +2,19 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+const publicPath = path.join(__dirname, '..', 'public');
+const uploadPath = path.join(publicPath, 'uploads');
+
+if (!fs.existsSync(publicPath)) {
+	fs.mkdirSync(publicPath);
+}
+if (!fs.existsSync(uploadPath)) {
+	fs.mkdirSync(uploadPath);
+}
+
 // Multer storage configuration
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		const uploadPath = 'uploads/';
-		// Check if the directory exists, if not, create it
-		if (!fs.existsSync(uploadPath)) {
-			fs.mkdirSync(uploadPath);
-		}
 		cb(null, uploadPath);
 	},
 	filename: function (req, file, cb) {
@@ -29,6 +34,7 @@ const fileFilter = (req, file, cb) => {
 		cb(new Error('Invalid file type. Only images are allowed.'), false);
 	}
 };
+
 const upload = multer({
 	storage: storage,
 	fileFilter: fileFilter,
