@@ -33,21 +33,6 @@ const createProduct = async (req, res) => {
 			stockQuantity,
 		} = req.body;
 
-		if (
-			typeof name !== 'string' ||
-			typeof description !== 'string' ||
-			typeof image !== 'string' ||
-			typeof category !== 'string' ||
-			typeof price !== 'number' ||
-			typeof manufacturer !== 'string' ||
-			typeof stockQuantity !== 'number'
-		) {
-			return res.status(400).json({
-				success: false,
-				message: 'Invalid data types. Check the format of the provided data.',
-			});
-		}
-
 		const productData = {
 			name: name,
 			description: description,

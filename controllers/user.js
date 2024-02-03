@@ -34,8 +34,7 @@ const createUser = async (req, res) => {
 		// Checking if user exists
 		const userEmail = email.toLowerCase();
 		let ifuser;
-		ifuser = await userModel.findOne({ userEmail });
-
+		ifuser = await userModel.findOne({ email: userEmail });
 		if (ifuser) {
 			console.log(ifuser);
 			// User already exists
