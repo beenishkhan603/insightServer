@@ -10,9 +10,15 @@ const nodemailer = require('nodemailer');
 const createUser = async (req, res) => {
 	try {
 		console.log('req.body is', req.body);
-
+		const { firstName, lastName, email, confirmPassword, password } = req.body;
 		// Check if required fields are provided
-		const requiredFields = ['email', 'firstName', 'lastName', 'password'];
+		const requiredFields = [
+			'email',
+			'firstName',
+			'lastName',
+			'password',
+			'confirmPassword',
+		];
 		const missingFields = requiredFields.filter((field) => !req.body[field]);
 
 		if (missingFields.length > 0) {
@@ -22,10 +28,17 @@ const createUser = async (req, res) => {
 			});
 		}
 
+		// Check if password and confirmPassword match
+		if (password !== confirmPassword) {
+			return res.status(400).json({
+				success: false,
+				message: 'Password and Confirm Password must match.',
+			});
+		}
 		// Checking if user exists
-		const email = req.body.email.toLowerCase();
+		const userEmail = email.toLowerCase();
 		let ifuser;
-		ifuser = await userModel.findOne({ email });
+		ifuser = await userModel.findOne({ userEmail });
 
 		if (ifuser) {
 			console.log(ifuser);
@@ -46,17 +59,14 @@ const createUser = async (req, res) => {
 			}
 		} else {
 			// Encrypting user password
-			const encryptedPassword = await bcrypt.hash(
-				req.body.password,
-				saltRounds
-			);
+			const encryptedPassword = await bcrypt.hash(password, saltRounds);
 
 			// Saving user to DB
 			let newUser;
 			newUser = await new userModel({
-				email: email,
-				firstname: req.body.firstName,
-				lastname: req.body.lastName,
+				email: userEmail,
+				firstname: firstName,
+				lastname: lastName,
 				password: encryptedPassword,
 			}).save();
 
