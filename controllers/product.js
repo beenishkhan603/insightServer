@@ -89,15 +89,23 @@ const fetchProduct = async (req, res) => {
 // Function to update a product
 const updateProduct = async (req, res) => {
 	try {
-		const productId = req.body.id;
-		const updatedData = req.body.updatedData;
-
+		const productId = req.params.id;
+		const { name, description, category, price, manufacturer, stockQuantity } =
+			req.body;
+		const updatedData = {
+			name,
+			description,
+			category,
+			price,
+			manufacturer,
+			stockQuantity,
+		};
+		console.log('updated', updatedData);
 		const updatedProduct = await Product.findByIdAndUpdate(
 			productId,
-			updatedData,
-			{ new: true, runValidators: true }
+			updatedData
 		);
-
+		console.log('updatsadasded', updatedProduct);
 		if (!updatedProduct) {
 			return res
 				.status(404)

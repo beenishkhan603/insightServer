@@ -12,7 +12,12 @@ router.post(
 );
 router.get('/', authenticateUser, productController.fetchProducts);
 router.get('/:id', authenticateUser, productController.fetchProduct);
-router.patch('/', authenticateUser, productController.updateProduct);
+router.put(
+	'/:id',
+	authenticateUser,
+	uploadProductImage,
+	productController.updateProduct
+);
 router.delete('/:id', authenticateUser, productController.removeProduct);
 
 module.exports = router;
