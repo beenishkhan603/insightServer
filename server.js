@@ -17,8 +17,8 @@ db.once('open', () => {
 	console.log('Connected to MongoDB');
 });
 
-app.use('/backend', userRoutes);
-app.use('/backend/product', productRoutes);
+app.use('/', userRoutes);
+app.use('/product', productRoutes);
 app.listen(port, () => {
 	console.log(`Server is running on http://localhost:${port}`);
 });
