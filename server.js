@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const userRoutes = require('./routes/user');
 const productRoutes = require('./routes/product');
+const statsRoutes = require('./routes/stats');
 const db = require('./utils/dbConfig');
 
 const app = express();
@@ -20,6 +21,8 @@ db.once('open', () => {
 
 app.use('/', userRoutes);
 app.use('/product', productRoutes);
+app.use('/stats', statsRoutes);
+
 app.listen(port, () => {
 	console.log(`Server is running on http://localhost:${port}`);
 });
