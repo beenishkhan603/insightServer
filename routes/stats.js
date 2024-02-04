@@ -5,4 +5,6 @@ const authenticateUser = require('../utils/authMiddleware');
 
 router.get('/monthly', authenticateUser, statsController.getMonthlyStats);
 router.get('/overall', authenticateUser, statsController.getStats);
+router.get('/yearly', authenticateUser, statsController.getYearlyStats);
+
 module.exports = router;

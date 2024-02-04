@@ -23,7 +23,7 @@ const generateMonthlyStats = (stats) => {
 	stats.forEach((stat) => {
 		const monthKey = stat._id;
 		const monthName = monthNames[parseInt(monthKey.split('-')[1], 10) - 1];
-		monthlyStats[monthName] = stat.newUserCount || 0;
+		monthlyStats[monthName] = stat.newUserCount || stat.newProductCount || 0;
 	});
 	return monthlyStats;
 };
@@ -66,6 +66,7 @@ const getMonthlyStats = async (req, res) => {
 				},
 			},
 		]);
+		console.log(productStats);
 		const userMonthlyStats = generateMonthlyStats(userStats);
 		const productMonthlyStats = generateMonthlyStats(productStats);
 
@@ -97,5 +98,96 @@ const getStats = async (req, res) => {
 		res.status(500).json({ success: false, message: 'Internal Server Error' });
 	}
 };
+const getUserStatsByYear = async (year) => {
+	return await User.aggregate([
+		{
+			$match: {
+				createdAt: {
+					$gte: new Date(`${year}-01-01`),
+					$lt: new Date(`${year + 1}-01-01`),
+				},
+			},
+		},
+		{
+			$group: {
+				_id: {
+					$dateToString: { format: '%Y-%m', date: '$createdAt' },
+				},
+				newUserCount: { $sum: 1 },
+			},
+		},
+	]);
+};
 
-module.exports = { getStats, getMonthlyStats };
+const getProductStatsByYear = async (year) => {
+	return await Product.aggregate([
+		{
+			$match: {
+				createdAt: {
+					$gte: new Date(`${year}-01-01`),
+					$lt: new Date(`${year + 1}-01-01`),
+				},
+			},
+		},
+		{
+			$group: {
+				_id: {
+					$dateToString: { format: '%Y-%m', date: '$createdAt' },
+				},
+				newProductCount: { $sum: 1 },
+			},
+		},
+	]);
+};
+
+const getYearlyStats = async (req, res) => {
+	try {
+		const currentYear = new Date().getFullYear();
+		const yearlyStats = [];
+
+		for (let i = 0; i < 3; i++) {
+			const year = currentYear - i;
+			const userStats = await getUserStatsByYear(year);
+			const productStats = await getProductStatsByYear(year);
+
+			yearlyStats.push({
+				year,
+				userStats: generateMonthlyStats(userStats),
+				productStats: generateMonthlyStats(productStats),
+			});
+		}
+
+		// Sum the monthly values for each year
+		const userStatsSum = {};
+		const productStatsSum = {};
+
+		yearlyStats.forEach(({ year, userStats, productStats }) => {
+			userStatsSum[year] = userStatsSum[year] || 0;
+			productStatsSum[year] = productStatsSum[year] || 0;
+
+			userStatsSum[year] += Object.values(userStats).reduce(
+				(acc, value) => acc + value,
+				0
+			);
+			productStatsSum[year] += Object.values(productStats).reduce(
+				(acc, value) => acc + value,
+				0
+			);
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: 'Yearly statistics fetched successfully',
+			data: {
+				userStats: userStatsSum,
+				productStats: productStatsSum,
+			},
+		});
+	} catch (error) {
+		console.error('Error fetching yearly statistics:', error);
+		return res
+			.status(500)
+			.json({ success: false, message: 'Internal Server Error' });
+	}
+};
+module.exports = { getStats, getMonthlyStats, getYearlyStats };
