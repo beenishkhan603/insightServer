@@ -19,5 +19,6 @@ Follow these steps to install the project:
    git clone https://github.com/beenishkhan603/insightServer.git
 2. install dependency
    npm i
-3. Run the project
+3. insert values in .env
+4. Run the project
    npm run start
